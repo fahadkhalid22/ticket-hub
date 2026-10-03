@@ -1,0 +1,7 @@
+{
+  "name": "tickethub-tools",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "dependencies": {"@supabase/supabase-js": "2.117.2"}
+}
