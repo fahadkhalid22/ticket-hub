@@ -73,26 +73,37 @@ for (const [name,slug,city,status,owner_id] of businessDefs) {
 }
 
 const listingDefs = [
- ['Grand Cinema Islamabad','cinema','Midnight Premiere','Cinema',true],['Grand Cinema Islamabad','cinema','Family Animation Weekend','Cinema',true],['Grand Cinema Islamabad','events','Director Q&A Night','Special Event',false],
- ['Pulse Live Pakistan','concerts','Islamabad Live 2026','Concert',true],['Pulse Live Pakistan','concerts','Acoustic Sunset','Concert',false],
- ['Capital Sports Arena','sports','Capital Derby','Football',true],['Capital Sports Arena','sports','Weekend Basketball Cup','Basketball',false],
- ['Makers Lab Islamabad','workshops','Pottery for Beginners','Workshop',true],['Makers Lab Islamabad','workshops','Build Your First Robot','Workshop',false],
- ['Adventure World Park','attractions','Adventure Day Pass','Attraction',true],['Adventure World Park','experiences','Zipline Experience','Experience',false],['Adventure World Park','events','Family Night Festival','Event',true],
+  ['Grand Cinema Islamabad','cinema','Midnight Premiere','Cinema',true,'A red-carpet midnight premiere with premium cinema sound.','Grand Cinema Islamabad • Hall A','2026-10-19T14:00:00.000Z',800],
+  ['Grand Cinema Islamabad','cinema','Family Animation Weekend','Cinema',true,'A colourful family animation screening for kids and parents.','Grand Cinema Islamabad • Hall A','2026-10-20T14:00:00.000Z',1075],
+  ['Grand Cinema Islamabad','events','Director Q&A Night','Special Event',false,'A cinema screening followed by a live director question-and-answer session.','Grand Cinema Islamabad • Hall A','2026-10-21T14:00:00.000Z',1150],
+  ['Pulse Live Pakistan','concerts','Islamabad Live 2026','Concert',true,'A large-scale live concert featuring local performers.','Pulse Live Pakistan • Islamabad','2026-10-22T14:00:00.000Z',1500],
+  ['Pulse Live Pakistan','concerts','Acoustic Sunset','Concert',false,'An outdoor acoustic concert under the evening sky.','Pulse Live Pakistan • Islamabad','2026-10-23T14:00:00.000Z',1300],
+  ['Capital Sports Arena','sports','Capital Derby','Football',true,'A high-energy football derby at Capital Sports Arena.','Capital Sports Arena • Islamabad','2026-10-24T14:00:00.000Z',1375],
+  ['Capital Sports Arena','sports','Weekend Basketball Cup','Basketball',false,'A weekend basketball cup with general and courtside viewing.','Capital Sports Arena • Islamabad','2026-10-25T14:00:00.000Z',1450],
+  ['Makers Lab Islamabad','workshops','Pottery for Beginners','Workshop',true,'A guided beginner pottery workshop with materials included.','Makers Lab Islamabad','2026-10-26T14:00:00.000Z',1525],
+  ['Makers Lab Islamabad','workshops','Build Your First Robot','Workshop',false,'A hands-on beginner robotics workshop at Makers Lab Islamabad.','Makers Lab Islamabad','2026-10-27T14:00:00.000Z',1600],
+  ['Adventure World Park','attractions','Adventure Day Pass','Attraction',true,'An evening pass for selected family rides and attractions.','Adventure World Park • Rawalpindi','2026-10-28T14:00:00.000Z',1675],
+  ['Adventure World Park','experiences','Zipline Experience','Experience',false,'A guided sunset zipline experience at Adventure World Park.','Adventure World Park • Rawalpindi','2026-10-29T14:00:00.000Z',1750],
+  ['Adventure World Park','events','Family Night Festival','Event',true,'A family night festival with rides, food and live activities.','Adventure World Park • Rawalpindi','2026-10-30T14:00:00.000Z',1825],
 ]
 const listings=[]
-for (const [businessName,slug,title,event_type,is_featured] of listingDefs) {
+for (const [businessName,slug,title,event_type,is_featured,description,location_text,starts_at,price] of listingDefs) {
   const business=businesses[businessName]
   let row=await maybeOne('listings',{business_id:business.id,title})
-  if(!row) row=await insertOne('listings',{business_id:business.id,category_id:cid[slug],title,description:`Enjoy ${title} through TicketHub.`,event_type,location_text:`${business.city} venue`,terms:'Venue rules apply. Eligible cancellations use the configured platform window.',status:'active',is_featured,booking_open:true})
-  listings.push(row)
+  const values={business_id:business.id,category_id:cid[slug],title,description,event_type,location_text,terms:'Venue rules apply. Eligible cancellations use the configured platform window.',status:'active',is_featured,booking_open:true}
+  if(!row) row=await insertOne('listings',values)
+  else { const {data,error}=await db.from('listings').update(values).eq('id',row.id).select().single(); if(error)throw error; row=data }
+  listings.push({...row,starts_at,price})
 }
 
-const startAt=(days)=>{const d=new Date();d.setUTCDate(d.getUTCDate()+days);d.setUTCHours(19,0,0,0);return d}
 for(let i=0;i<listings.length;i++){
+  const start=new Date(listings[i].starts_at)
+  const scheduleValues={starts_at:start.toISOString(),ends_at:new Date(start.getTime()+7200000).toISOString(),venue_or_hall:listings[i].location_text,capacity:i===3?650:120,booking_limit_per_user:6,status:'active'}
   let schedule=await maybeOne('schedules',{listing_id:listings[i].id})
-  if(!schedule){const start=startAt(7+i);schedule=await insertOne('schedules',{listing_id:listings[i].id,starts_at:start.toISOString(),ends_at:new Date(start.getTime()+7200000).toISOString(),venue_or_hall:i<3?'Hall A':`Venue ${i+1}`,capacity:i===3?650:120,booking_limit_per_user:6,status:'active'})}
-  const defs=i===0?[['Regular',800,80],['Premium',1200,30],['VIP',1800,10]]:i===3?[['General Admission',1500,500],['VIP',3000,100],['Premium',5000,50]]:[['General',1000+i*75,120]]
-  for(let k=0;k<defs.length;k++){const [name,price,total_qty]=defs[k];if(!await maybeOne('ticket_types',{schedule_id:schedule.id,name}))await insertOne('ticket_types',{schedule_id:schedule.id,name,price,total_qty,sold_qty:0,held_qty:0,sort_order:k})}
+  if(!schedule) schedule=await insertOne('schedules',{listing_id:listings[i].id,...scheduleValues})
+  else { const {data,error}=await db.from('schedules').update(scheduleValues).eq('id',schedule.id).select().single(); if(error)throw error; schedule=data }
+  const defs=i===0?[['Regular',800,80],['Premium',1200,30],['VIP',1800,10]]:i===3?[['General Admission',1500,500],['VIP',3000,100],['Premium',5000,50]]:[['General',listings[i].price,120]]
+  for(let k=0;k<defs.length;k++){const [name,price,total_qty]=defs[k];const type=await maybeOne('ticket_types',{schedule_id:schedule.id,name});if(!type)await insertOne('ticket_types',{schedule_id:schedule.id,name,price,total_qty,sold_qty:0,held_qty:0,sort_order:k});else {const {error}=await db.from('ticket_types').update({price,total_qty,sort_order:k}).eq('id',type.id);if(error)throw error}}
 }
 
 // Create one visual seat map for the first cinema schedule.

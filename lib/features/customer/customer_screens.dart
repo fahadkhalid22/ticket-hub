@@ -54,7 +54,10 @@ class CustomerHomeScreen extends ConsumerWidget {
                   onTap: () => context.push('/search'),
                   borderRadius: BorderRadius.circular(18),
                   child: Ink(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(18),
@@ -63,7 +66,11 @@ class CustomerHomeScreen extends ConsumerWidget {
                       children: [
                         Icon(Icons.search),
                         SizedBox(width: 10),
-                        Expanded(child: Text('Search events, businesses, experiences...')),
+                        Expanded(
+                          child: Text(
+                            'Search events, businesses, experiences...',
+                          ),
+                        ),
                         Icon(Icons.tune),
                       ],
                     ),
@@ -71,36 +78,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(22),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF5B3CF5), Color(0xFFD845D8)],
-                  ),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Your next experience starts here',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Concerts, sports, workshops, attractions and more.',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            const SliverToBoxAdapter(child: _HomePromoBanners()),
             const SliverToBoxAdapter(child: SectionHeader('Categories')),
             SliverToBoxAdapter(
               child: SizedBox(
@@ -114,7 +92,10 @@ class CustomerHomeScreen extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final category = data[index];
                       return ActionChip(
-                        avatar: const Icon(Icons.local_activity_outlined, size: 18),
+                        avatar: const Icon(
+                          Icons.local_activity_outlined,
+                          size: 18,
+                        ),
                         label: Text(category.name),
                         onPressed: () => context.push(
                           '/category/${category.id}?name=${Uri.encodeComponent(category.name)}',
@@ -122,17 +103,22 @@ class CustomerHomeScreen extends ConsumerWidget {
                       );
                     },
                   ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Center(child: Text('$e')),
                 ),
               ),
             ),
-            const SliverToBoxAdapter(child: SectionHeader('Featured Businesses')),
+            const SliverToBoxAdapter(
+              child: SectionHeader('Featured Businesses'),
+            ),
             SliverToBoxAdapter(
               child: businesses.when(
                 data: (data) {
                   if (data.isEmpty) {
-                    return const EmptyState(message: 'No approved businesses yet.');
+                    return const EmptyState(
+                      message: 'No approved businesses yet.',
+                    );
                   }
                   final shown = data.take(8).toList();
                   return SizedBox(
@@ -146,7 +132,8 @@ class CustomerHomeScreen extends ConsumerWidget {
                         width: 320,
                         child: BusinessCard(
                           business: shown[index],
-                          onTap: () => context.push('/business/${shown[index].id}'),
+                          onTap: () =>
+                              context.push('/business/${shown[index].id}'),
                         ),
                       ),
                     ),
@@ -161,7 +148,9 @@ class CustomerHomeScreen extends ConsumerWidget {
               data: (data) {
                 if (data.isEmpty) {
                   return const SliverToBoxAdapter(
-                    child: EmptyState(message: 'Featured listings will appear here.'),
+                    child: EmptyState(
+                      message: 'Featured listings will appear here.',
+                    ),
                   );
                 }
                 return SliverPadding(
@@ -179,11 +168,22 @@ class CustomerHomeScreen extends ConsumerWidget {
               loading: () => const SliverToBoxAdapter(
                 child: Center(child: CircularProgressIndicator()),
               ),
-              error: (e, _) => SliverToBoxAdapter(child: ErrorState(message: '$e')),
+              error: (e, _) =>
+                  SliverToBoxAdapter(child: ErrorState(message: '$e')),
             ),
-            const _HomeDiscoverySection(title: 'Popular Tickets', sort: 'Popular'),
-            const _HomeDiscoverySection(title: 'Upcoming Events', sort: 'Upcoming'),
-            const _HomeDiscoverySection(title: 'Recommended For You', sort: 'Highest Rated', bottomPadding: 120),
+            const _HomeDiscoverySection(
+              title: 'Popular Tickets',
+              sort: 'Popular',
+            ),
+            const _HomeDiscoverySection(
+              title: 'Upcoming Events',
+              sort: 'Upcoming',
+            ),
+            const _HomeDiscoverySection(
+              title: 'Recommended For You',
+              sort: 'Highest Rated',
+              bottomPadding: 120,
+            ),
           ],
         ),
       ),
@@ -205,11 +205,111 @@ class CustomerHomeScreen extends ConsumerWidget {
             icon: Icon(Icons.confirmation_number_outlined),
             label: 'Tickets',
           ),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
         ],
       ),
     );
   }
+}
+
+class _HomePromoBanners extends StatelessWidget {
+  const _HomePromoBanners();
+
+  @override
+  Widget build(BuildContext context) {
+    final banners = const [
+      _BannerData(
+        assetPath: 'assets/images/home_banner_live_events.png',
+        title: 'Live Events This Week',
+        subtitle: 'Concerts, sports and shows ready to book now.',
+      ),
+      _BannerData(
+        assetPath: 'assets/images/home_banner_family_fun.png',
+        title: 'Family Fun & Attractions',
+        subtitle: 'Find cinemas, parks and exciting attractions.',
+      ),
+      _BannerData(
+        assetPath: 'assets/images/home_banner_learn_explore.png',
+        title: 'Learn, Explore, Experience',
+        subtitle: 'Workshops, tours and unique activities in one place.',
+      ),
+    ];
+
+    return SizedBox(
+      height: 220,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        scrollDirection: Axis.horizontal,
+        itemCount: banners.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final banner = banners[index];
+          return SizedBox(
+            width: 340,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(banner.assetPath, fit: BoxFit.cover),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: .35),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 18,
+                    right: 18,
+                    bottom: 18,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          banner.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          banner.subtitle,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _BannerData {
+  const _BannerData({
+    required this.assetPath,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String assetPath;
+  final String title;
+  final String subtitle;
 }
 
 class _HomeDiscoverySection extends ConsumerWidget {
@@ -225,78 +325,81 @@ class _HomeDiscoverySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => SliverToBoxAdapter(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionHeader(
-              title,
-              action: TextButton(
-                onPressed: () => context.push('/search'),
-                child: const Text('See all'),
-              ),
-            ),
-            FutureBuilder<List<ListingSearchResult>>(
-              future: ref.read(repositoryProvider).searchListings(sort: sort, limit: 6),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return const SizedBox(
-                    height: 120,
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ErrorState(message: '${snapshot.error}'),
-                  );
-                }
-                final items = snapshot.data ?? [];
-                if (items.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Nothing to show yet.'),
-                  );
-                }
-                return SizedBox(
-                  height: 286,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return SizedBox(
-                        width: 300,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListingCard(
-                              listing: item.listing,
-                              onTap: () => context.push('/listing/${item.listing.id}'),
-                            ),
-                            const SizedBox(height: 6),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                '${item.minPrice == null ? 'Price TBA' : 'From ${money(item.minPrice!)}'} • ${item.remaining} left',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.labelMedium,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: bottomPadding),
-          ],
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          title,
+          action: TextButton(
+            onPressed: () => context.push('/search'),
+            child: const Text('See all'),
+          ),
         ),
-      );
+        FutureBuilder<List<ListingSearchResult>>(
+          future: ref
+              .read(repositoryProvider)
+              .searchListings(sort: sort, limit: 6),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const SizedBox(
+                height: 120,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasError) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ErrorState(message: '${snapshot.error}'),
+              );
+            }
+            final items = snapshot.data ?? [];
+            if (items.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text('Nothing to show yet.'),
+              );
+            }
+            return SizedBox(
+              height: 344,
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                itemCount: items.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return SizedBox(
+                    width: 300,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListingCard(
+                          listing: item.listing,
+                          onTap: () =>
+                              context.push('/listing/${item.listing.id}'),
+                        ),
+                        const SizedBox(height: 6),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            '${item.minPrice == null ? 'Price TBA' : 'From ${money(item.minPrice!)}'} • ${item.remaining} left',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+        SizedBox(height: bottomPadding),
+      ],
+    ),
+  );
 }
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -455,9 +558,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: tempPriceEnabled,
-                  onChanged: (value) => setSheetState(() => tempPriceEnabled = value),
+                  onChanged: (value) =>
+                      setSheetState(() => tempPriceEnabled = value),
                   title: const Text('Filter by price'),
-                  subtitle: Text('${money(tempRange.start)} – ${money(tempRange.end)}'),
+                  subtitle: Text(
+                    '${money(tempRange.start)} – ${money(tempRange.end)}',
+                  ),
                 ),
                 if (tempPriceEnabled)
                   RangeSlider(
@@ -465,13 +571,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     min: 0,
                     max: 10000,
                     divisions: 100,
-                    labels: RangeLabels(money(tempRange.start), money(tempRange.end)),
-                    onChanged: (value) => setSheetState(() => tempRange = value),
+                    labels: RangeLabels(
+                      money(tempRange.start),
+                      money(tempRange.end),
+                    ),
+                    onChanged: (value) =>
+                        setSheetState(() => tempRange = value),
                   ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: tempAvailable,
-                  onChanged: (value) => setSheetState(() => tempAvailable = value),
+                  onChanged: (value) =>
+                      setSheetState(() => tempAvailable = value),
                   title: const Text('Available tickets only'),
                 ),
                 const SizedBox(height: 12),
@@ -554,67 +665,123 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FutureBuilder<List<Category>>(
-                        future: ref.read(repositoryProvider).categories(),
-                        builder: (context, snapshot) {
-                          final categories = snapshot.data ?? [];
-                          return DropdownButtonFormField<String?>(
-                            initialValue: categoryId,
-                            decoration: const InputDecoration(labelText: 'Category'),
-                            items: [
-                              const DropdownMenuItem<String?>(
-                                value: null,
-                                child: Text('All categories'),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final stacked = constraints.maxWidth < 360;
+                    final categoryDropdown = FutureBuilder<List<Category>>(
+                      future: ref.read(repositoryProvider).categories(),
+                      builder: (context, snapshot) {
+                        final categories = snapshot.data ?? [];
+                        return CompactFilterDropdown<String?>(
+                          label: 'Category',
+                          leading: Icons.grid_view_rounded,
+                          value: categoryId,
+                          items: [
+                            const DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text('All categories'),
+                            ),
+                            ...categories.map(
+                              (e) => DropdownMenuItem<String?>(
+                                value: e.id,
+                                child: Text(e.name),
                               ),
-                              ...categories.map(
-                                (e) => DropdownMenuItem<String?>(
-                                  value: e.id,
-                                  child: Text(e.name),
-                                ),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              setState(() => categoryId = value);
-                              _search();
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue: sort,
-                        decoration: const InputDecoration(labelText: 'Sort'),
-                        items: const [
-                          'Popular',
-                          'Newest',
-                          'Price Low-High',
-                          'Price High-Low',
-                          'Highest Rated',
-                          'Upcoming',
-                        ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (value) {
-                          setState(() => sort = value ?? sort);
-                          _search();
-                        },
-                      ),
-                    ),
-                  ],
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() => categoryId = value);
+                            _search();
+                          },
+                        );
+                      },
+                    );
+                    final sortDropdown = CompactFilterDropdown<String>(
+                      label: 'Sort',
+                      leading: Icons.swap_vert_rounded,
+                      value: sort,
+                      items:
+                          const [
+                                'Popular',
+                                'Newest',
+                                'Price Low-High',
+                                'Price High-Low',
+                                'Highest Rated',
+                                'Upcoming',
+                              ]
+                              .map(
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
+                              )
+                              .toList(),
+                      onChanged: (value) {
+                        setState(() => sort = value ?? sort);
+                        _search();
+                      },
+                    );
+                    if (stacked) {
+                      return Column(
+                        children: [
+                          categoryDropdown,
+                          const SizedBox(height: 10),
+                          sortDropdown,
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(child: categoryDropdown),
+                        const SizedBox(width: 12),
+                        Expanded(child: sortDropdown),
+                      ],
+                    );
+                  },
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
                     onPressed: _openFilters,
-                    icon: const Icon(Icons.tune),
-                    label: Text(
-                      activeFilterCount == 0
-                          ? 'More filters'
-                          : 'More filters ($activeFilterCount active)',
+                    icon: const Icon(Icons.tune_rounded),
+                    label: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          activeFilterCount == 0
+                              ? 'More filters'
+                              : 'More filters ($activeFilterCount active)',
+                        ),
+                        if (activeFilterCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary
+                                  .withValues(alpha: .12),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              '$activeFilterCount',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
@@ -638,7 +805,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               padding: const EdgeInsets.only(bottom: 10),
                               child: BusinessCard(
                                 business: business,
-                                onTap: () => context.push('/business/${business.id}'),
+                                onTap: () =>
+                                    context.push('/business/${business.id}'),
                               ),
                             ),
                           ),
@@ -653,20 +821,39 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 children: [
                                   ListingCard(
                                     listing: result.listing,
-                                    onTap: () => context.push('/listing/${result.listing.id}'),
+                                    onTap: () => context.push(
+                                      '/listing/${result.listing.id}',
+                                    ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(12, 7, 12, 0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      12,
+                                      7,
+                                      12,
+                                      0,
+                                    ),
                                     child: Wrap(
                                       spacing: 8,
                                       runSpacing: 6,
                                       children: [
                                         Chip(label: Text(result.businessName)),
                                         if (result.minPrice != null)
-                                          Chip(label: Text('From ${money(result.minPrice!)}')),
+                                          Chip(
+                                            label: Text(
+                                              'From ${money(result.minPrice!)}',
+                                            ),
+                                          ),
                                         if (result.nextStart != null)
-                                          Chip(label: Text(prettyDate(result.nextStart!))),
-                                        Chip(label: Text('${result.remaining} remaining')),
+                                          Chip(
+                                            label: Text(
+                                              prettyDate(result.nextStart!),
+                                            ),
+                                          ),
+                                        Chip(
+                                          label: Text(
+                                            '${result.remaining} remaining',
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -707,10 +894,14 @@ class CategoryScreen extends ConsumerWidget {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError) return ErrorState(message: '${snapshot.error}');
+          if (snapshot.hasError) {
+            return ErrorState(message: '${snapshot.error}');
+          }
           final data = snapshot.data ?? [];
           if (data.isEmpty) {
-            return const EmptyState(message: 'No active listings in this category yet.');
+            return const EmptyState(
+              message: 'No active listings in this category yet.',
+            );
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -750,7 +941,9 @@ class _BusinessDetailsState extends ConsumerState<BusinessDetailsScreen> {
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         if (snapshot.hasError) {
           return Scaffold(body: ErrorState(message: '${snapshot.error}'));
@@ -776,7 +969,9 @@ class _BusinessDetailsState extends ConsumerState<BusinessDetailsScreen> {
                       ref.invalidate(favoriteIdsProvider);
                     },
                     icon: Icon(
-                      (favorite ?? false) ? Icons.favorite : Icons.favorite_border,
+                      (favorite ?? false)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
                       color: (favorite ?? false) ? Colors.red : null,
                     ),
                   ),
@@ -816,7 +1011,9 @@ class _BusinessDetailsState extends ConsumerState<BusinessDetailsScreen> {
                             children: [
                               Text(
                                 business.name,
-                                style: Theme.of(context).textTheme.headlineSmall,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall,
                               ),
                               Text(
                                 '★ ${business.ratingAvg.toStringAsFixed(1)} • ${business.ratingCount} reviews',
@@ -889,7 +1086,9 @@ class ListingDetailsScreen extends ConsumerWidget {
       future: Future.wait([repo.listing(id), repo.schedules(id)]),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         if (snapshot.hasError) {
           return Scaffold(body: ErrorState(message: '${snapshot.error}'));
@@ -903,30 +1102,23 @@ class ListingDetailsScreen extends ConsumerWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: listing.posterUrl == null
-                      ? Container(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          child: const Icon(Icons.local_activity, size: 70),
-                        )
-                      : Image.network(
-                          listing.posterUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const Center(
-                            child: Icon(Icons.broken_image),
-                          ),
-                        ),
+                child: ListingArtwork(
+                  listing: listing,
+                  borderRadius: BorderRadius.circular(24),
                 ),
               ),
               const SizedBox(height: 18),
-              Text(listing.title, style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                listing.title,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  if (listing.eventType != null) Chip(label: Text(listing.eventType!)),
+                  if (listing.eventType != null)
+                    Chip(label: Text(listing.eventType!)),
                   if (listing.locationText != null)
                     Chip(
                       avatar: const Icon(Icons.location_on_outlined, size: 18),
@@ -938,7 +1130,9 @@ class ListingDetailsScreen extends ConsumerWidget {
               Text(listing.description ?? ''),
               const SectionHeader('Choose date & time'),
               if (schedules.isEmpty)
-                const EmptyState(message: 'No bookable schedules are available.'),
+                const EmptyState(
+                  message: 'No bookable schedules are available.',
+                ),
               ...schedules.map(
                 (schedule) => Card(
                   child: ListTile(
@@ -952,7 +1146,9 @@ class ListingDetailsScreen extends ConsumerWidget {
                             ? '/seat-select/${schedule.id}'
                             : '/ticket-select/${schedule.id}',
                       ),
-                      child: Text(schedule.isSeated ? 'Select seats' : 'Tickets'),
+                      child: Text(
+                        schedule.isSeated ? 'Select seats' : 'Tickets',
+                      ),
                     ),
                   ),
                 ),
@@ -981,7 +1177,9 @@ class MyTicketsScreen extends ConsumerWidget {
       child: async.when(
         data: (data) {
           if (data.isEmpty) {
-            return const EmptyState(message: 'You have no digital tickets yet.');
+            return const EmptyState(
+              message: 'You have no digital tickets yet.',
+            );
           }
           return DefaultTabController(
             length: 3,
@@ -999,11 +1197,15 @@ class MyTicketsScreen extends ConsumerWidget {
                     children: [
                       _ticketList(
                         context,
-                        data.where((e) => e.status == TicketStatus.valid).toList(),
+                        data
+                            .where((e) => e.status == TicketStatus.valid)
+                            .toList(),
                       ),
                       _ticketList(
                         context,
-                        data.where((e) => e.status == TicketStatus.used).toList(),
+                        data
+                            .where((e) => e.status == TicketStatus.used)
+                            .toList(),
                       ),
                       _ticketList(
                         context,
@@ -1029,7 +1231,9 @@ class MyTicketsScreen extends ConsumerWidget {
   }
 
   Widget _ticketList(BuildContext context, List<DigitalTicket> data) {
-    if (data.isEmpty) return const EmptyState(message: 'No tickets in this tab.');
+    if (data.isEmpty) {
+      return const EmptyState(message: 'No tickets in this tab.');
+    }
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: data.length,
@@ -1065,7 +1269,9 @@ class BookingHistoryScreen extends ConsumerWidget {
       title: 'Booking History',
       child: async.when(
         data: (data) {
-          if (data.isEmpty) return const EmptyState(message: 'No bookings yet.');
+          if (data.isEmpty) {
+            return const EmptyState(message: 'No bookings yet.');
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: data.length,
@@ -1103,7 +1309,9 @@ class NotificationsScreen extends ConsumerWidget {
       title: 'Notifications',
       child: async.when(
         data: (data) {
-          if (data.isEmpty) return const EmptyState(message: 'No notifications yet.');
+          if (data.isEmpty) {
+            return const EmptyState(message: 'No notifications yet.');
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: data.length,
@@ -1122,13 +1330,17 @@ class NotificationsScreen extends ConsumerWidget {
                   title: Text(
                     item.title,
                     style: TextStyle(
-                      fontWeight: item.isRead ? FontWeight.w500 : FontWeight.w800,
+                      fontWeight: item.isRead
+                          ? FontWeight.w500
+                          : FontWeight.w800,
                     ),
                   ),
                   subtitle: Text('${item.body}\n${prettyDate(item.createdAt)}'),
                   isThreeLine: true,
                   onTap: () async {
-                    await ref.read(repositoryProvider).markNotificationRead(item.id);
+                    await ref
+                        .read(repositoryProvider)
+                        .markNotificationRead(item.id);
                     ref.invalidate(notificationsProvider);
                   },
                 ),
@@ -1153,7 +1365,9 @@ class ProfileScreen extends ConsumerWidget {
       title: 'Account',
       child: async.when(
         data: (profile) {
-          if (profile == null) return const EmptyState(message: 'Please sign in.');
+          if (profile == null) {
+            return const EmptyState(message: 'Please sign in.');
+          }
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -1172,7 +1386,10 @@ class ProfileScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              Text(profile.role.name.toUpperCase(), textAlign: TextAlign.center),
+              Text(
+                profile.role.name.toUpperCase(),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () => _edit(context, ref, profile),
@@ -1180,11 +1397,31 @@ class ProfileScreen extends ConsumerWidget {
                 label: const Text('Edit Personal Information'),
               ),
               const SizedBox(height: 24),
-              _link(context, Icons.confirmation_number_outlined, 'My Tickets', '/my-tickets'),
+              _link(
+                context,
+                Icons.confirmation_number_outlined,
+                'My Tickets',
+                '/my-tickets',
+              ),
               _link(context, Icons.history, 'Booking History', '/history'),
-              _link(context, Icons.favorite_border, 'Favorite Businesses', '/favorites'),
-              _link(context, Icons.receipt_long_outlined, 'Payment History', '/payments'),
-              _link(context, Icons.notifications_outlined, 'Notifications', '/notifications'),
+              _link(
+                context,
+                Icons.favorite_border,
+                'Favorite Businesses',
+                '/favorites',
+              ),
+              _link(
+                context,
+                Icons.receipt_long_outlined,
+                'Payment History',
+                '/payments',
+              ),
+              _link(
+                context,
+                Icons.notifications_outlined,
+                'Notifications',
+                '/notifications',
+              ),
               _link(context, Icons.settings_outlined, 'Settings', '/settings'),
               const SizedBox(height: 20),
               OutlinedButton.icon(
@@ -1204,7 +1441,12 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _link(BuildContext context, IconData icon, String title, String route) {
+  Widget _link(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String route,
+  ) {
     return Card(
       child: ListTile(
         leading: Icon(icon),
@@ -1215,10 +1457,15 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _edit(BuildContext context, WidgetRef ref, Profile profile) async {
+  Future<void> _edit(
+    BuildContext context,
+    WidgetRef ref,
+    Profile profile,
+  ) async {
     final name = TextEditingController(text: profile.fullName);
     final phone = TextEditingController(text: profile.phone ?? '');
-    final ok = await showDialog<bool>(
+    final ok =
+        await showDialog<bool>(
           context: context,
           builder: (dialogContext) => AlertDialog(
             title: const Text('Personal Information'),
@@ -1250,10 +1497,9 @@ class ProfileScreen extends ConsumerWidget {
         ) ??
         false;
     if (ok) {
-      await ref.read(repositoryProvider).updateProfile(
-            fullName: name.text,
-            phone: phone.text,
-          );
+      await ref
+          .read(repositoryProvider)
+          .updateProfile(fullName: name.text, phone: phone.text);
       ref.invalidate(currentProfileProvider);
     }
     name.dispose();
@@ -1274,7 +1520,9 @@ class FavoritesScreen extends ConsumerWidget {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError) return ErrorState(message: '${snapshot.error}');
+          if (snapshot.hasError) {
+            return ErrorState(message: '${snapshot.error}');
+          }
           final data = snapshot.data ?? [];
           if (data.isEmpty) {
             return const EmptyState(
@@ -1309,9 +1557,13 @@ class PaymentsScreen extends ConsumerWidget {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError) return ErrorState(message: '${snapshot.error}');
+          if (snapshot.hasError) {
+            return ErrorState(message: '${snapshot.error}');
+          }
           final data = snapshot.data ?? [];
-          if (data.isEmpty) return const EmptyState(message: 'No payment records yet.');
+          if (data.isEmpty) {
+            return const EmptyState(message: 'No payment records yet.');
+          }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: data.length,
@@ -1320,7 +1572,9 @@ class PaymentsScreen extends ConsumerWidget {
               final row = data[index];
               return Card(
                 child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.payments_outlined)),
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.payments_outlined),
+                  ),
                   title: Text(
                     '${row['method']} • ${money((row['amount'] as num?) ?? 0)}',
                   ),
